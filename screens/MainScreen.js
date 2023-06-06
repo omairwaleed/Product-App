@@ -5,7 +5,7 @@ import Container from "./Components/Container";
 import LoadingComponent from "./Components/LoadingComponent";
 //you can adjust this global variables
 const api="https://dummyjson.com/products"  
-const no_items_page=6
+const no_items_page=7
 
 export default function MainScreen({navigation}) {
 
@@ -17,7 +17,7 @@ export default function MainScreen({navigation}) {
   const load_data=async(api)=>{                   //loading and sorting data descending from api
     const data=await fetchData(api)
     let pages=data.products.length/no_items_page
-    setno_pages(pages)
+    setno_pages(Math.ceil(pages))
     const sorted_data=data.products.sort((a,b) => (a.title.toLowerCase() < b.title.toLowerCase()) ? 1 : ((b.title.toLowerCase() < a.title.toLowerCase()) ? -1 : 0))
     setitems(sorted_data)
     setloading(false)
@@ -35,6 +35,18 @@ export default function MainScreen({navigation}) {
   }
  
   useEffect(()=>{load_data(api)},[]);  //fetching products one time on first rendering
+
+  useEffect(()=>{
+    setno_pages((previous_state)=>
+    {
+      
+      const new_state =items.length/no_items_page
+      if (Math.ceil(new_state) !==Math.ceil(previous_state)){
+        setindex_page((previous_state)=>previous_state-1)
+      }
+      setno_pages(Math.ceil(new_state))
+    })
+  },[items])
   return (
     <View>
       
